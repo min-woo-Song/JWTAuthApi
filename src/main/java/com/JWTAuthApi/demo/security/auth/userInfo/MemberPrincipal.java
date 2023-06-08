@@ -20,9 +20,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MemberPrincipal implements OAuth2User, OidcUser {
 
+    private final Long id;
     private final String email;
     private final String name;
-    private final String password;
     private final ProviderType providerType;
     private final Collection<GrantedAuthority> authorities;
     private Map<String, Object> attributes;
@@ -56,5 +56,4 @@ public class MemberPrincipal implements OAuth2User, OidcUser {
     public OidcIdToken getIdToken() {
         return null;
     }
-
 }

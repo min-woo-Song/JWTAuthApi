@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Preflight 허용
                     .antMatchers( "/members/signup", "/members/login", "/members/refreshToken").permitAll()
-                    .antMatchers("/").permitAll()
+                    .antMatchers("/", "/test").permitAll()
                     .antMatchers("/login/**").permitAll()
                     .antMatchers(GET,"/**").hasAnyRole("USER", "ADMIN")
                     .antMatchers(POST,"/**").hasAnyRole("USER", "ADMIN")
@@ -55,7 +55,7 @@ public class SecurityConfig {
             .and()
                     .authorizationEndpoint()
                     .baseUri("/oauth2/authorization")
-                .and()
+            .and()
                 .and()
                 .build();
     }

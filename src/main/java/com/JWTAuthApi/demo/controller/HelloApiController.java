@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloApiController {
     private final JwtTokenizer jwtTokenizer;
 
-    @GetMapping("/")
-    public String index() {
-        return "index.html";
-    }
+
 
     @GetMapping("/hello")
     public String hello(@RequestHeader("Authorization") String token) {

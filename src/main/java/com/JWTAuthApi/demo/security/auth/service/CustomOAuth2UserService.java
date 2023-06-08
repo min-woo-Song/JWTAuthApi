@@ -30,58 +30,62 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User member = super.loadUser(userRequest);
+        // userRequest에 있는 Access Token으로 유저정보 획득
+        OAuth2User oAuth2User = super.loadUser(userRequest);
 
         try {
-            return this.process(userRequest, member);
+            return this.process(userRequest, oAuth2User);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
+            // 시스템 문제로 내부 인증관련 처리 요청을 할 수 없는 경우
         }
     }
 
-    private OAuth2User process(OAuth2UserRequest userRequest, OAuth2User member) {
+    private OAuth2User process(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
 
         // GOOGLE, KAKAO, NAVER, FACEBOOK 등 provider 타입을 가져온다
         ProviderType providerType = ProviderType.valueOf(userRequest.getClientRegistration()
                 .getRegistrationId().toUpperCase());
 
         // providerType, Attributes 이용하여 분류
-        OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, member.getAttributes());
-        Optional<Member> findMember = memberRepository.findByEmail(userInfo.getEmail());
+        OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, oAuth2User.getAttributes());
+
+        Optional<Member> optionalMember = memberRepository.findByEmail(userInfo.getEmail());
+        Member member;
 
         // 이미 가입되어 있고 ProviderType 이 다르면 업데이트
-        if (findMember.isPresent()) {
-            if (providerType != findMember.get().getProviderType()) {
+        if (optionalMember.isPresent()) {
+            member = optionalMember.get();
+            if (providerType != member.getProviderType()) {
                 throw new OAuthProviderMissMatchException(
-                        "Looks like you're signed up with " + providerType +
-                                " account. Please use your " + findMember.get().getProviderType() + " account to login.");
+                        "you're signed up with " + providerType +
+                                " account. Please use your " + member.getProviderType() + " account to login.");
             }
-            updateMember(findMember.get(), userInfo);
+            Member memberUpdate = updateMember(member, userInfo);
         } else  // 가입되어있지 않은 회원이면 가입
-            findMember = Optional.of(createMember(userInfo, providerType));
+            member = createMember(userInfo, providerType);
 
-        Member principal = findMember.get();
         // OAuth2User 상속받은 MemberPrincipal 객체에 담아서 반환
         return new MemberPrincipal(
-                principal.getEmail(),
-                principal.getName(),
-                null,
-                principal.getProviderType(),
+                member.getMemberId(),
+                member.getEmail(),
+                member.getName(),
+                member.getProviderType(),
                 Collections.singletonList(new SimpleGrantedAuthority(RoleType.USER.getCode()))
                 );
     }
 
     // 받은 데이터로 DB 저장
     private Member createMember(OAuth2UserInfo userInfo, ProviderType providerType) {
-        Member member = new Member(
-                userInfo.getEmail(),
-                userInfo.getName(),
-                null,
-                providerType,
-                RoleType.USER
-        );
-        return memberRepository.saveAndFlush(member);
+        Member member = Member.builder()
+                .email(userInfo.getEmail())
+                .name(userInfo.getName())
+                .password(null)
+                .providerType(providerType)
+                .roleType(RoleType.USER)
+                .build();
+        return memberRepository.save(member);
     }
 
     private Member updateMember(Member member, OAuth2UserInfo userInfo) {
