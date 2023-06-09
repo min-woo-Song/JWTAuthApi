@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000")    // 외부에서 들어오는 경로 http://localhost:3000 허용
-                .allowedMethods("GET", "POST", "PATCH", "PUT", "OPTIONS", "DELETE")
+                .allowedMethods("GET", "POST", "PATCH", "PUT", "OPTIONS")
                 .allowCredentials(true);
     }
 }

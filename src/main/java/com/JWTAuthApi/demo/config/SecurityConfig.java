@@ -1,6 +1,7 @@
 package com.JWTAuthApi.demo.config;
 
 import com.JWTAuthApi.demo.security.auth.service.CustomOAuth2UserService;
+import com.JWTAuthApi.demo.security.auth.service.OAuth2AuthenticationSuccessHandler;
 import com.JWTAuthApi.demo.security.jwt.exception.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -11,8 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsUtils;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,11 +41,9 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Preflight 허용
-                    .antMatchers( "/members/signup", "/members/login", "/members/refreshToken").permitAll()
-                    .antMatchers("/", "/test").permitAll()
-                    .antMatchers("/login/**").permitAll()
-                    .antMatchers(GET,"/**").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(POST,"/**").hasAnyRole("USER", "ADMIN")
+                    .antMatchers( "/", "/users", "/users/login", "/users/refreshToken").permitAll()
+                    .antMatchers(GET,"/user").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(PUT,"/user").hasAnyRole("USER", "ADMIN")
                     .anyRequest().hasAnyRole("USER", "ADMIN")
             .and()
                 .exceptionHandling()
@@ -59,7 +57,8 @@ public class SecurityConfig {
                     .baseUri("/oauth2/authorization")
             .and()
             .successHandler(oAuth2AuthenticationSuccessHandler)
-                .and()
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+            .and()
                 .build();
     }
 }

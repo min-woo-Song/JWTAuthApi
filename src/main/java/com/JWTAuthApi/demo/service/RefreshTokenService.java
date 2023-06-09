@@ -14,7 +14,7 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public RefreshToken addRefreshToken(RefreshToken refreshToken) {
+    public RefreshToken saveRefreshToken(RefreshToken refreshToken) {
         return refreshTokenRepository.save(refreshToken);
     }
 

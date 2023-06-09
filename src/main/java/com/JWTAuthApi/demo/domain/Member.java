@@ -1,6 +1,7 @@
 package com.JWTAuthApi.demo.domain;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Builder
+@DynamicUpdate
 public class Member {
 
     @Id

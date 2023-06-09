@@ -23,7 +23,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/members")
 @Slf4j
 public class MemberController {
 
@@ -32,10 +31,10 @@ public class MemberController {
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
 
-    @PostMapping("/signup")
-    public ResponseEntity signup(@RequestBody @Valid MemberSignupDto memberSignupDto, BindingResult bindingResult) {
+    @PostMapping("/users")
+    public ResponseEntity<MemberSignupResponseDto> register(@RequestBody @Valid MemberSignupDto memberSignupDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Member member = new Member();
         member.setName(memberSignupDto.getName());
@@ -46,24 +45,24 @@ public class MemberController {
 
         MemberSignupResponseDto memberSignupResponse = new MemberSignupResponseDto();
         memberSignupResponse.setMemberId(saveMember.getMemberId());
-        memberSignupResponse.setName(saveMember.getName());
         memberSignupResponse.setEmail(saveMember.getEmail());
+        memberSignupResponse.setName(saveMember.getName());
 
         // 회원가입
-        return new ResponseEntity(memberSignupResponse, HttpStatus.CREATED);
+        return new ResponseEntity<>(memberSignupResponse, HttpStatus.CREATED);
     }
 
 
-    @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid MemberLoginDto loginDto, BindingResult bindingResult) {
+    @PostMapping("/users/login")
+    public ResponseEntity<MemberLoginResponseDto> login(@RequestBody @Valid MemberLoginDto loginDto, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         Member member = memberService.findByEmail(loginDto.getEmail());
-        if(!passwordEncoder.matches(loginDto.getPassword(), member.getPassword())){
-            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        if (!passwordEncoder.matches(loginDto.getPassword(), member.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         // JWT 토큰 생성
@@ -74,7 +73,7 @@ public class MemberController {
         RefreshToken refreshTokenEntity = new RefreshToken();
         refreshTokenEntity.setValue(refreshToken);
         refreshTokenEntity.setMemberId(member.getMemberId());
-        refreshTokenService.addRefreshToken(refreshTokenEntity);
+        refreshTokenService.saveRefreshToken(refreshTokenEntity);
 
         MemberLoginResponseDto loginResponse = MemberLoginResponseDto.builder()
                 .accessToken(accessToken)
@@ -82,22 +81,22 @@ public class MemberController {
                 .memberId(member.getMemberId())
                 .name(member.getName())
                 .build();
-        return new ResponseEntity(loginResponse, HttpStatus.OK);
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 
-    @DeleteMapping("/logout")
+    @PostMapping("/users/logout")
     public ResponseEntity logout(@RequestBody RefreshTokenDto refreshTokenDto) {
         log.info("logout test");
         refreshTokenService.deleteRefreshToken(refreshTokenDto.getRefreshToken());
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/refreshToken")
-    public ResponseEntity requestRefresh(@RequestBody RefreshTokenDto refreshTokenDto) {
+    @PostMapping("/users/refreshToken")
+    public ResponseEntity<MemberLoginResponseDto> requestRefresh(@RequestBody RefreshTokenDto refreshTokenDto) {
         RefreshToken refreshToken = refreshTokenService.findRefreshToken(refreshTokenDto.getRefreshToken()).orElseThrow(() -> new IllegalArgumentException("Refresh token not found"));
         Claims claims = jwtTokenizer.parseRefreshToken(refreshToken.getValue());
 
-        Long memberId = Long.valueOf((Integer)claims.get("memberId"));
+        Long memberId = Long.valueOf((Integer) claims.get("memberId"));
 
         Member member = memberService.getMember(memberId).orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
@@ -113,6 +112,18 @@ public class MemberController {
                 .memberId(member.getMemberId())
                 .name(member.getName())
                 .build();
-        return new ResponseEntity(loginResponse, HttpStatus.OK);
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity currentUser() {
+
+        return null;
+    }
+
+    @PutMapping("/user")
+    public ResponseEntity updateUser(@RequestHeader String authorization) {
+
+        return null;
     }
 }

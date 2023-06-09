@@ -21,6 +21,11 @@ public class MemberService {
     }
 
     @Transactional
+    public Member findByMemberId(Long id) {
+        return memberRepository.findById(id).orElseThrow(()->new IllegalArgumentException("해당 사용자가 없습니다"));
+    }
+
+    @Transactional
     public Member saveMember(Member member) {
         member.setRoleType(RoleType.USER);
         member.setProviderType(ProviderType.LOCAL);
