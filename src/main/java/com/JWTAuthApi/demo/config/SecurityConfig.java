@@ -24,6 +24,8 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -56,6 +58,7 @@ public class SecurityConfig {
                     .authorizationEndpoint()
                     .baseUri("/oauth2/authorization")
             .and()
+            .successHandler(oAuth2AuthenticationSuccessHandler)
                 .and()
                 .build();
     }
