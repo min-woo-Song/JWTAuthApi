@@ -1,0 +1,60 @@
+jwt:
+  secretKey: 19516845132116516515615616561552
+  refreshKey: 19516845132116516515615616561552
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/oauth?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  #Security OAuth
+  security:
+    oauth2.client:
+      registration:
+        google:
+          clientId: 1078399991571-qfed0cijq4npgbhqp5veuo9kclj8ce2v.apps.googleusercontent.com
+          clientSecret: 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
+          scope:
+            - email
+            - profile
+        naver:
+          clientId: P9oaJss7R05XDnj2KpC8
+          clientSecret: ZHQYd0eewD
+          clientAuthenticationMethod: post
+          authorizationGrantType: authorization_code
+          redirectUri: http://localhost:8080/login/oauth2/code/naver
+          scope:
+            - nickname
+            - email
+            - profile_image
+          clientName: Naver
+        kakao:
+          clientId: 10afd91b41e0046228b526fad32bf25a
+          clientSecret: XxUghNKBG4I58ZtACLdlAqo64QkivEiw
+          clientAuthenticationMethod: post
+          authorizationGrantType: authorization_code
+          redirectUri: http://localhost:8080/login/oauth2/code/kakao
+          scope:
+            - profile_nickname
+            - account_email
+          clientName: Kakao
+      provider:
+        naver:
+          authorizationUri: https://nid.naver.com/oauth2.0/authorize
+          tokenUri: https://nid.naver.com/oauth2.0/token
+          userInfoUri: https://openapi.naver.com/v1/nid/me
+          userNameAttribute: response
+        kakao:
+          authorizationUri: https://kauth.kakao.com/oauth/authorize
+          tokenUri: https://kauth.kakao.com/oauth/token
+          userInfoUri: https://kapi.kakao.com/v2/user/me
+          userNameAttribute: id
