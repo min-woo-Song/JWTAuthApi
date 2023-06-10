@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 jwt:
   secretKey: 19516845132116516515615616561552
   refreshKey: 19516845132116516515615616561552
@@ -58,3 +59,6 @@ spring:
           tokenUri: https://kauth.kakao.com/oauth/token
           userInfoUri: https://kapi.kakao.com/v2/user/me
           userNameAttribute: id
+=======
+
+>>>>>>> origin/master
