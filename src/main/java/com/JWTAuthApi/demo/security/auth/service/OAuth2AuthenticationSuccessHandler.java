@@ -1,6 +1,8 @@
 package com.JWTAuthApi.demo.security.auth.service;
 
-import com.JWTAuthApi.demo.security.auth.userInfo.MemberPrincipal;
+import com.JWTAuthApi.demo.domain.RefreshToken;
+import com.JWTAuthApi.demo.mapper.RefreshTokenRepository;
+import com.JWTAuthApi.demo.security.auth.userInfo.UserPrincipal;
 import com.JWTAuthApi.demo.security.auth.util.CookieAuthorizationRequestRepository;
 import com.JWTAuthApi.demo.security.auth.util.CookieUtils;
 import com.JWTAuthApi.demo.security.jwt.util.JwtTokenizer;
@@ -29,7 +31,10 @@ import static com.JWTAuthApi.demo.security.auth.util.CookieAuthorizationRequestR
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenizer jwtTokenizer;
+
     private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
+
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -42,6 +47,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             log.debug("Response has already been committed.");
             return;
         }
+        // URI 쿠키 삭제
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
@@ -57,16 +63,30 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        //JWT 생성
-        MemberPrincipal memberPrincipal = (MemberPrincipal) authentication.getPrincipal();
-        Long id = memberPrincipal.getId();
-        String email = memberPrincipal.getEmail();
-        String name = memberPrincipal.getName();
-        String role = memberPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+        //
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        Long userId = userPrincipal.getUserId();
+        String email = userPrincipal.getEmail();
+        String name = userPrincipal.getUsername();
+        String role = userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        String accessToken = jwtTokenizer.createAccessToken(id, email, name, role);
-        String refreshToken = jwtTokenizer.createRefreshToken(id, email, name, role);
+        //JWT 생성
+        String accessToken = jwtTokenizer.createAccessToken(userId, email, name, role);
+        String refreshToken = jwtTokenizer.createRefreshToken(userId, email, name, role);
+
+        RefreshToken RToken = new RefreshToken();
+        RToken.setValue(refreshToken);
+        RToken.setUserId(userId);
+
+        RefreshToken findToken = refreshTokenRepository.findRefreshToken(userId);
+        // RefreshToken이 이미 있으면 해당 userId의 토큰을 업데이트 한다
+        if (findToken != null){
+            refreshTokenRepository.updateRefreshToken(userId, refreshToken);
+            // RefreshToken 첫 생성시 save
+        } else {
+            refreshTokenRepository.saveRefreshToken(RToken);
+        }
 
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("accessToken", accessToken)

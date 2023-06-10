@@ -1,20 +1,24 @@
-package com.JWTAuthApi.demo.dto;
+package com.JWTAuthApi.demo.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
-
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberLoginDto {
-    @NotEmpty
+public class User {
+    private Long userId;
+
     private String email;
 
-    @NotEmpty
     private String password;
+
+    private String username;
+
+    private ProviderType providerType;
+
+    private RoleType roleType;
 }

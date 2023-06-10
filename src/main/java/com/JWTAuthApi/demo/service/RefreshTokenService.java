@@ -1,30 +1,26 @@
 package com.JWTAuthApi.demo.service;
 
 import com.JWTAuthApi.demo.domain.RefreshToken;
-import com.JWTAuthApi.demo.repository.RefreshTokenRepository;
+import com.JWTAuthApi.demo.mapper.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
+
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Transactional
     public RefreshToken saveRefreshToken(RefreshToken refreshToken) {
-        return refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.saveRefreshToken(refreshToken);
+        return refreshToken;
     }
 
-    @Transactional
+    public RefreshToken findRefreshToken(Long userId) {
+        return refreshTokenRepository.findRefreshToken(userId);
+    }
+
     public void deleteRefreshToken(String refreshToken) {
-        refreshTokenRepository.findByValue(refreshToken).ifPresent(refreshTokenRepository::delete);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<RefreshToken> findRefreshToken(String refreshToken) {
-        return refreshTokenRepository.findByValue(refreshToken);
+        refreshTokenRepository.deleteRefreshToken(refreshToken);
     }
 }

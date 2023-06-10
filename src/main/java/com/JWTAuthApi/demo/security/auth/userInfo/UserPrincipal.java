@@ -18,11 +18,11 @@ import java.util.Map;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class MemberPrincipal implements OAuth2User, OidcUser {
+public class UserPrincipal implements OAuth2User, OidcUser {
 
-    private final Long id;
+    private final Long userId;
     private final String email;
-    private final String name;
+    private final String username;
     private final ProviderType providerType;
     private final Collection<GrantedAuthority> authorities;
     private Map<String, Object> attributes;
@@ -37,9 +37,8 @@ public class MemberPrincipal implements OAuth2User, OidcUser {
         return authorities;
     }
 
-    @Override
     public String getName() {
-        return name;
+        return username;
     }
 
     @Override

@@ -45,7 +45,7 @@ public class JwtTokenizer {
         Claims claims = Jwts.claims().setSubject(email);
 
         claims.put("roleType", roleType);
-        claims.put("memberId", id);
+        claims.put("userId", id);
         claims.put("name", name);
 
         return Jwts.builder()
@@ -63,7 +63,7 @@ public class JwtTokenizer {
         String[] tokenArr = token.split(" ");
         token = tokenArr[1];
         Claims claims = parseToken(token, accessSecret);
-        return Long.valueOf((Integer)claims.get("memberId"));
+        return Long.valueOf((Integer)claims.get("userId"));
     }
 
     public Claims parseAccessToken(String accessToken) {

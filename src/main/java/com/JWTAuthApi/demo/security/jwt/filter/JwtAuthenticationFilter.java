@@ -75,11 +75,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     }
 
     private void getAuthentication(String token) {
+        // 미인증 토큰 생성 후 JwtAuthenticationProvider의 authenticate(token) 메서드 실행
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(token);
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authenticate);
     }
 
+    // request 헤더에 담긴 AccessToken의 Token String을 가져온다
     private String getToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
         if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer")){

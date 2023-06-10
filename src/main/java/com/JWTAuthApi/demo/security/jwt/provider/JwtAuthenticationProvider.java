@@ -2,7 +2,7 @@ package com.JWTAuthApi.demo.security.jwt.provider;
 
 import com.JWTAuthApi.demo.security.jwt.token.JwtAuthenticationToken;
 import com.JWTAuthApi.demo.security.jwt.util.JwtTokenizer;
-import com.JWTAuthApi.demo.security.jwt.util.MemberInfo;
+import com.JWTAuthApi.demo.security.jwt.util.UserInfo;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,20 +27,21 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) authentication;
+
         // 전달받은 토큰을 검증한다. 기간이 만료되었는지, 토큰 문자열이 문제가 있는지 등
         Claims claims = jwtTokenizer.parseAccessToken(authenticationToken.getToken());
 
-        Long memberId = claims.get("memberId", Long.class);
+        Long userId = claims.get("userId", Long.class);
         String email = claims.getSubject();
-        String name = claims.get("name", String.class);
+        String name = claims.get("username", String.class);
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
 
-        MemberInfo memberInfo = new MemberInfo();
-        memberInfo.setMemberId(memberId);
-        memberInfo.setEmail(email);
-        memberInfo.setName(name);
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(userId);
+        userInfo.setEmail(email);
+        userInfo.setName(name);
 
-        return new JwtAuthenticationToken(authorities, memberInfo, null);
+        return new JwtAuthenticationToken(authorities, userInfo, null);
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(Claims claims) {
