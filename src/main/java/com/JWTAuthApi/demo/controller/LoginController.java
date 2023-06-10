@@ -12,6 +12,7 @@ import com.JWTAuthApi.demo.dto.user.UserSignupResponseDto;
 import com.JWTAuthApi.demo.security.jwt.util.JwtTokenizer;
 import com.JWTAuthApi.demo.service.RefreshTokenService;
 import com.JWTAuthApi.demo.service.UserService;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -78,7 +80,7 @@ public class LoginController {
         UserLoginResponseDto userLoginResponseDto = UserLoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .memberId(user.getUserId())
+                .userId(user.getUserId())
                 .name(user.getUsername())
                 .build();
 
@@ -96,5 +98,34 @@ public class LoginController {
         Long userId = jwtTokenizer.getUserIdFromToken(authorization);
         userService.updateUser(userId, username.get("username"));
         return new ResponseEntity<>(username, HttpStatus.OK);
+    }
+
+    @PostMapping("/users/refreshToken")
+    public ResponseEntity requestRefresh(@RequestBody RefreshTokenDto refreshTokenDto) {
+
+        // TODO refreshToken 검증 실패시 에러 추가해야함
+        Claims claims = jwtTokenizer.parseRefreshToken(refreshTokenDto.getRefreshToken());
+
+        // RefreshToken 에서 userId 추출
+        Long userId = Long.valueOf((Integer) claims.get("userId"));
+
+        // 추출한 userId 로 RefreshToken 서치 없을 시 에러
+        User user = userService.findById(userId);
+
+        List roles = (List) claims.get("roles");
+        String email = claims.getSubject();
+        String name = (String) claims.get("username");
+
+        // DB 에서 가져온 정보로 AccessToken 생성
+        String accessToken = jwtTokenizer.createAccessToken(userId, email, name, RoleType.USER.getCode());
+
+        UserLoginResponseDto loginResponse = UserLoginResponseDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshTokenDto.getRefreshToken())
+                .userId(userId)
+                .name(user.getUsername())
+                .build();
+
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 }

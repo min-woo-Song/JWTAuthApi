@@ -13,13 +13,13 @@ spring:
     oauth2.client:
       registration:
         google:
-          clientId: # Id
-          clientSecret: # Pwd
+          clientId: 1078399991571-qfed0cijq4npgbhqp5veuo9kclj8ce2v.apps.googleusercontent.com
+          clientSecret: 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
           scope:
             - email
             - profile
         naver:
-          clientId: # Id
+          clientId: uTMKMTSJcg4qwpgNQeu9
           clientSecret: ZFkHn2pIZ6
           clientAuthenticationMethod: post
           authorizationGrantType: authorization_code
@@ -30,8 +30,8 @@ spring:
             - profile_image
           clientName: Naver
         kakao:
-          clientId: # Id
-          clientSecret: # Pwd
+          clientId: 10afd91b41e0046228b526fad32bf25a
+          clientSecret: XxUghNKBG4I58ZtACLdlAqo64QkivEiw
           clientAuthenticationMethod: post
           authorizationGrantType: authorization_code
           redirectUri: http://localhost:8080/login/oauth2/code/kakao

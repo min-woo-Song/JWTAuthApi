@@ -24,6 +24,11 @@ public class UserService {
     }
 
     @Transactional
+    public User findById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
+    @Transactional
     public void updateUser(Long userId, String username) {
         userRepository.updateUser(userId, username);
     }

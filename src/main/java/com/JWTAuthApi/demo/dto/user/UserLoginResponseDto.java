@@ -13,6 +13,6 @@ public class UserLoginResponseDto {
     private String accessToken;
     private String refreshToken;
 
-    private Long memberId;
+    private Long userId;
     private String name;
 }

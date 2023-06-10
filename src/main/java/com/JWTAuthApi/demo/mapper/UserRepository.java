@@ -9,5 +9,7 @@ public interface UserRepository {
 
     User findByEmail(String email);
 
+    User findById(Long userId);
+
     void updateUser(Long userId, String username);
 }
