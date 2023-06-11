@@ -61,9 +61,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
             throw new RuntimeException("redirect URIs are not matched.");
         }
+
+        // 없을 시 "/"
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        //
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         Long userId = userPrincipal.getUserId();
         String email = userPrincipal.getEmail();

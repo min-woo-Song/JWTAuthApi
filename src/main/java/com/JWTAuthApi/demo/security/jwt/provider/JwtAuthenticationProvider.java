@@ -33,13 +33,13 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
         Long userId = claims.get("userId", Long.class);
         String email = claims.getSubject();
-        String name = claims.get("username", String.class);
+        String username = claims.get("username", String.class);
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
 
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(userId);
         userInfo.setEmail(email);
-        userInfo.setName(name);
+        userInfo.setUsername(username);
 
         return new JwtAuthenticationToken(authorities, userInfo, null);
     }

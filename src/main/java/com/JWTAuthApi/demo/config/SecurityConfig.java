@@ -57,7 +57,6 @@ public class SecurityConfig {
                     .authorizationEndpoint()
                     .baseUri("/oauth2/authorization")
             .and()
-            .successHandler(oAuth2AuthenticationSuccessHandler)
                 .successHandler(oAuth2AuthenticationSuccessHandler)
             .and()
                 .build();

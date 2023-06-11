@@ -46,7 +46,7 @@ public class JwtTokenizer {
 
         claims.put("roleType", roleType);
         claims.put("userId", id);
-        claims.put("name", name);
+        claims.put("username", name);
 
         return Jwts.builder()
                 .setClaims(claims)
