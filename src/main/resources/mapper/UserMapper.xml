@@ -25,4 +25,10 @@
         set username = #{username}
         where user_id = #{userId}
     </update>
+
+    <update id="updateUserPassword">
+        update USER
+        set password = #{password}
+        where user_id = #{userId}
+    </update>
 </mapper>

@@ -30,8 +30,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token="";
+        log.info("req= {}",request.getParameter("email"));
         try {
+            log.info("***** 토큰 검증 로직 실행 *****");
             token = getToken(request);
+            log.info("***** request 토큰 값 = {} ***** ", token);
             if (StringUtils.hasText(token)) {
                 getAuthentication(token);
             }
@@ -79,6 +82,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(token);
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authenticate);
+        log.info("***** SecurityContext 저장 완료 *****");
+        log.info("값 확인= {}", authenticate.getPrincipal());
     }
 
     // request 헤더에 담긴 AccessToken의 Token String을 가져온다

@@ -32,4 +32,9 @@ public class UserService {
     public void updateUser(Long userId, String username) {
         userRepository.updateUser(userId, username);
     }
+
+    @Transactional
+    public void updateUserPassword(Long userId, String password) {
+        userRepository.updateUserPassword(userId, password);
+    }
 }

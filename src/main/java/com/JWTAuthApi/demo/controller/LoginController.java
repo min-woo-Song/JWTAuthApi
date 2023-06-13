@@ -5,10 +5,7 @@ import com.JWTAuthApi.demo.domain.RefreshToken;
 import com.JWTAuthApi.demo.domain.RoleType;
 import com.JWTAuthApi.demo.domain.User;
 import com.JWTAuthApi.demo.dto.token.RefreshTokenDto;
-import com.JWTAuthApi.demo.dto.user.UserLoginDto;
-import com.JWTAuthApi.demo.dto.user.UserLoginResponseDto;
-import com.JWTAuthApi.demo.dto.user.UserSignupDto;
-import com.JWTAuthApi.demo.dto.user.UserSignupResponseDto;
+import com.JWTAuthApi.demo.dto.user.*;
 import com.JWTAuthApi.demo.security.jwt.util.JwtTokenizer;
 import com.JWTAuthApi.demo.service.RefreshTokenService;
 import com.JWTAuthApi.demo.service.UserService;
@@ -35,6 +32,11 @@ public class LoginController {
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * ProtoType
+     * Controller가 하지 않아도 되는 Logic 전부 Service로 이동시켜야 함
+     */
+
     // 회원 가입
     @PostMapping("/users")
     public ResponseEntity register(@RequestBody UserSignupDto userSignupDto) {
@@ -48,8 +50,10 @@ public class LoginController {
                 .roleType(RoleType.USER)
                 .build();
 
+        // DB 저장
         User saveUser = userService.saveUser(user);
 
+        // DTO 생성 후 반환
         UserSignupResponseDto userSignupResponseDto = UserSignupResponseDto
                 .builder()
                 .userId(saveUser.getUserId())
@@ -59,9 +63,11 @@ public class LoginController {
         return new ResponseEntity<>(userSignupResponseDto, HttpStatus.CREATED);
     }
 
+    // 로그인
     @PostMapping("/users/login")
     public ResponseEntity login(@RequestBody UserLoginDto userLoginDto) {
 
+        // DB password 검사, 다를 시 401 에러
         User user = userService.findByEmail(userLoginDto.getEmail());
         if (!passwordEncoder.matches(userLoginDto.getPassword(), user.getPassword())) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -86,21 +92,53 @@ public class LoginController {
 
         return new ResponseEntity<>(userLoginResponseDto, HttpStatus.OK);
     }
-
+    
+    // 로그아웃
     @PostMapping("/users/logout")
     public ResponseEntity logout(@RequestBody RefreshTokenDto refreshTokenDto) {
         refreshTokenService.deleteRefreshToken(refreshTokenDto.getRefreshToken());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/user")
-    public ResponseEntity updateUser(@RequestHeader String authorization, @RequestBody Map<String, String> username) {
+    // 유저 정보
+    @GetMapping("/user")
+    public ResponseEntity currentUser(@RequestHeader String authorization) {
+        // SecurityContextHolder 에서 가져올 수도 있음. 어떤것이 좋을지 아직 확실치 않음
         Long userId = jwtTokenizer.getUserIdFromToken(authorization);
-        userService.updateUser(userId, username.get("username"));
-        return new ResponseEntity<>(username, HttpStatus.OK);
+        User findUser = userService.findById(userId);
+
+        UserSignupResponseDto userSignupResponseDto = UserSignupResponseDto
+                .builder()
+                .userId(findUser.getUserId())
+                .email(findUser.getEmail())
+                .username(findUser.getUsername())
+                .build();
+        return new ResponseEntity<>(userSignupResponseDto, HttpStatus.OK);
     }
 
-    @PostMapping("/users/refreshToken")
+    /**
+     * Test 용 password까지 반환
+     * password는 api를 분리하는게 좋아 보임
+     */
+    @PutMapping("/user")
+    public ResponseEntity updateUser(@RequestHeader String authorization, @RequestBody @Valid UserUpdateDto userUpdateDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Long userId = jwtTokenizer.getUserIdFromToken(authorization);
+
+        userService.updateUser(userId, userUpdateDto.getUsername());
+        userService.updateUserPassword(userId, passwordEncoder.encode(userUpdateDto.getPassword()));
+        User findUser = userService.findById(userId);
+        UserUpdateResponseDto userUpdateResponseDto =
+                UserUpdateResponseDto
+                        .builder().username(findUser.getUsername()).password(findUser.getPassword()).build();
+
+        return new ResponseEntity<>(userUpdateResponseDto, HttpStatus.OK);
+    }
+
+    // 토큰 재발급
+    @PostMapping("/user/refreshToken")
     public ResponseEntity requestRefresh(@RequestBody RefreshTokenDto refreshTokenDto) {
 
         // TODO refreshToken 검증 실패시 에러 추가해야함

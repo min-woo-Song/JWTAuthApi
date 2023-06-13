@@ -17,7 +17,7 @@ import static org.springframework.http.HttpMethod.PUT;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 public class SecurityConfig {
 
     private final AuthenticationManagerConfig authenticationManagerConfig;
@@ -42,7 +42,8 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Preflight 허용
-                    .antMatchers( "/", "/users", "/users/login", "/users/refreshToken").permitAll()
+                    .antMatchers( "/", "/users", "/users/login", "/user/refreshToken").permitAll()
+                    .antMatchers("/test2").hasRole("USER")
                     .antMatchers(GET,"/user").hasAnyRole("USER", "ADMIN")
                     .antMatchers(PUT,"/user").hasAnyRole("USER", "ADMIN")
                     .anyRequest().hasAnyRole("USER", "ADMIN")

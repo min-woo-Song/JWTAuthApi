@@ -45,6 +45,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     }
 
     private List<GrantedAuthority> getGrantedAuthorities(Claims claims) {
+        log.info("***** getGrantedAuthorities= {} *****", claims.get("roleType").toString()); // ROLE_USER
         return Arrays.stream(new String[]{claims.get("roleType").toString()})
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
