@@ -2,6 +2,7 @@ package com.JWTAuthApi.demo.config;
 
 import com.JWTAuthApi.demo.security.auth.service.CustomOAuth2UserService;
 import com.JWTAuthApi.demo.security.auth.service.OAuth2AuthenticationSuccessHandler;
+import com.JWTAuthApi.demo.security.auth.util.CookieAuthorizationRequestRepository;
 import com.JWTAuthApi.demo.security.jwt.exception.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -28,10 +29,11 @@ public class SecurityConfig {
     
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
+    private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        return http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .formLogin().disable() // 직접 id, password를 입력받아서 JWT토큰을 리턴하는 API를 직접 만든다.
                 .csrf().disable()
@@ -57,6 +59,7 @@ public class SecurityConfig {
             .and()
                     .authorizationEndpoint()
                     .baseUri("/oauth2/authorization")
+                    .authorizationRequestRepository(cookieAuthorizationRequestRepository)
             .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler)
             .and()

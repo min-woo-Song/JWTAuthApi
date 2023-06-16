@@ -38,6 +38,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         try {
             return this.process(userRequest, oAuth2User);
         } catch (Exception ex) {
+            /**
+             * 사용금지
+             */
             ex.printStackTrace();
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
             // 시스템 문제로 내부 인증관련 처리 요청을 할 수 없는 경우

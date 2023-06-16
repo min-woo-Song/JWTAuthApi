@@ -42,6 +42,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         log.info("********** Success Handler 진입 **********");
 
         String targetUrl = determineTargetUrl(request, response, authentication);
+        log.info("*************url={}", targetUrl);
 
         if (response.isCommitted()) {
             log.debug("Response has already been committed.");
@@ -49,7 +50,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
         // URI 쿠키 삭제
         clearAuthenticationAttributes(request, response);
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        getRedirectStrategy().sendRedirect(
+                request,
+                response,
+                targetUrl
+        );
     }
 
     // 사용자 인증 정보를 통해 jwt token을 생성한다. 최초 oauth 인증 요청시 받았던 redirect uri를 검증하고 해당 uri로 토큰을 넘겨준다.
@@ -57,6 +62,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // 쿠키에 저장된 Redirect URI 획득
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
+
+        log.info("redirectUri={}", redirectUri);
 
         if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
             throw new RuntimeException("redirect URIs are not matched.");
@@ -89,7 +96,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             refreshTokenRepository.saveRefreshToken(RToken);
         }
 
-        return UriComponentsBuilder.fromUriString(targetUrl)
+        return UriComponentsBuilder
+                .fromUriString("http://localhost:3000/oauth/redirect")
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
                 .build().toUriString();

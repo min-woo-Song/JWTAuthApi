@@ -19,8 +19,8 @@ spring:
             - email
             - profile
         naver:
-          clientId: uTMKMTSJcg4qwpgNQeu9
-          clientSecret: ZFkHn2pIZ6
+          clientId: lPo0OLwGxO6vi3eV9iGQ
+          clientSecret: 8pCMJiDB8P
           clientAuthenticationMethod: post
           authorizationGrantType: authorization_code
           redirectUri: http://localhost:8080/login/oauth2/code/naver
@@ -57,3 +57,8 @@ mybatis:
   configuration.map-underscore-to-camel-case: true
   mapper-locations: classpath:mapper/*.xml
 
+
+app:
+  oauth2:
+    authorizedRedirectUris:
+      - http://localhost:3000/oauth/redirect
