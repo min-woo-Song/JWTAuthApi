@@ -4,11 +4,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @Getter
 @Setter
 public class RefreshToken {
     private Long id;
     private Long userId;
     private String value;
+
+    public RefreshToken(Long userId, String value) {
+        this.userId = userId;
+        this.value = value;
+    }
 }

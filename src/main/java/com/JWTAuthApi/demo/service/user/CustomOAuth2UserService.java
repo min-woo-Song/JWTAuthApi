@@ -1,4 +1,4 @@
-package com.JWTAuthApi.demo.security.auth.service;
+package com.JWTAuthApi.demo.service.user;
 
 import com.JWTAuthApi.demo.domain.ProviderType;
 import com.JWTAuthApi.demo.domain.RoleType;

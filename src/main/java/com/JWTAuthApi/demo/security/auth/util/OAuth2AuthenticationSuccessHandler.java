@@ -1,4 +1,4 @@
-package com.JWTAuthApi.demo.security.auth.service;
+package com.JWTAuthApi.demo.security.auth.util;
 
 import com.JWTAuthApi.demo.domain.RefreshToken;
 import com.JWTAuthApi.demo.mapper.RefreshTokenRepository;
@@ -8,6 +8,7 @@ import com.JWTAuthApi.demo.security.auth.util.CookieUtils;
 import com.JWTAuthApi.demo.security.jwt.util.JwtTokenizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -30,10 +31,10 @@ import static com.JWTAuthApi.demo.security.auth.util.CookieAuthorizationRequestR
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    @Value("${app.oauth2.authorizedRedirectUris}")
+    private String propertiesUrl;
     private final JwtTokenizer jwtTokenizer;
-
     private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
-
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
@@ -63,8 +64,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
-        log.info("redirectUri={}", redirectUri);
-
         if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
             throw new RuntimeException("redirect URIs are not matched.");
         }
@@ -83,9 +82,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String accessToken = jwtTokenizer.createAccessToken(userId, email, name, role);
         String refreshToken = jwtTokenizer.createRefreshToken(userId, email, name, role);
 
-        RefreshToken RToken = new RefreshToken();
-        RToken.setValue(refreshToken);
-        RToken.setUserId(userId);
+        RefreshToken RToken = new RefreshToken(userId, refreshToken);
 
         RefreshToken findToken = refreshTokenRepository.findRefreshToken(userId);
         // RefreshToken이 이미 있으면 해당 userId의 토큰을 업데이트 한다
@@ -97,7 +94,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         return UriComponentsBuilder
-                .fromUriString("http://localhost:3000/oauth/redirect")
+                .fromUriString(targetUrl)
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
                 .build().toUriString();
@@ -110,7 +107,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private boolean isAuthorizedRedirectUri(String uri) {
         URI clientRedirectUri = URI.create(uri);
-        URI authorizedUri = URI.create("http://localhost:3000/oauth/redirect");
+        URI authorizedUri = URI.create(propertiesUrl);
 
         return authorizedUri.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
                 && authorizedUri.getPort() == clientRedirectUri.getPort();

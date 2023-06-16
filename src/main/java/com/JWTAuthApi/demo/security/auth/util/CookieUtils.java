@@ -23,13 +23,6 @@ public class CookieUtils {
         return Optional.empty();
     }
 
-    public static Optional<String> readServletCookie(HttpServletRequest request, String name) {
-        return Arrays.stream(request.getCookies())
-                .filter(cookie -> name.equals(cookie.getName()))
-                .map(Cookie::getValue)
-                .findAny();
-    }
-
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");

@@ -1,7 +1,7 @@
 package com.JWTAuthApi.demo.config;
 
-import com.JWTAuthApi.demo.security.auth.service.CustomOAuth2UserService;
-import com.JWTAuthApi.demo.security.auth.service.OAuth2AuthenticationSuccessHandler;
+import com.JWTAuthApi.demo.service.user.CustomOAuth2UserService;
+import com.JWTAuthApi.demo.security.auth.util.OAuth2AuthenticationSuccessHandler;
 import com.JWTAuthApi.demo.security.auth.util.CookieAuthorizationRequestRepository;
 import com.JWTAuthApi.demo.security.jwt.exception.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;

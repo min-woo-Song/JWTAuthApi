@@ -38,14 +38,14 @@ public class IfLoginArgumentResolver implements HandlerMethodArgumentResolver {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken)authentication;
         LoginUser loginUser = new LoginUser();
 
-        Object principal = jwtAuthenticationToken.getPrincipal(); // LoginInfoDto
+        Object principal = jwtAuthenticationToken.getPrincipal(); // UserInfo
         if (principal == null)
             return null;
 
-        UserInfo loginInfoDto = (UserInfo)principal;
-        loginUser.setEmail(loginInfoDto.getEmail());
-        loginUser.setUserId(loginInfoDto.getUserId());
-        loginUser.setName(loginInfoDto.getUsername());
+        UserInfo userInfo = (UserInfo)principal;
+        loginUser.setEmail(userInfo.getEmail());
+        loginUser.setUserId(userInfo.getUserId());
+        loginUser.setName(userInfo.getUsername());
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (GrantedAuthority authority : authorities) {
