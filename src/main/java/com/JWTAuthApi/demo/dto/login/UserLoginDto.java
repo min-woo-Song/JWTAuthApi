@@ -1,4 +1,4 @@
-package com.JWTAuthApi.demo.dto.user;
+package com.JWTAuthApi.demo.dto.login;
 
 import lombok.Getter;
 

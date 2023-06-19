@@ -1,6 +1,6 @@
 package com.JWTAuthApi.demo.config;
 
-import com.JWTAuthApi.demo.service.user.CustomOAuth2UserService;
+import com.JWTAuthApi.demo.service.login.CustomOAuth2UserService;
 import com.JWTAuthApi.demo.security.auth.util.OAuth2AuthenticationSuccessHandler;
 import com.JWTAuthApi.demo.security.auth.util.CookieAuthorizationRequestRepository;
 import com.JWTAuthApi.demo.security.jwt.exception.CustomAuthenticationEntryPoint;
@@ -45,7 +45,6 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // Preflight 허용
                     .antMatchers( "/", "/users", "/users/login", "/user/refreshToken").permitAll()
-                    .antMatchers("/test2").hasRole("USER")
                     .antMatchers(GET,"/user").hasAnyRole("USER", "ADMIN")
                     .antMatchers(PUT,"/user").hasAnyRole("USER", "ADMIN")
                     .anyRequest().hasAnyRole("USER", "ADMIN")

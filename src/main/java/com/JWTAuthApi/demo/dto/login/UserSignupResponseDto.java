@@ -1,4 +1,4 @@
-package com.JWTAuthApi.demo.dto.user;
+package com.JWTAuthApi.demo.dto.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,8 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-public class UserSignupDto {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserSignupResponseDto {
+    private Long userId;
     private String email;
-    private String password;
     private String username;
 }

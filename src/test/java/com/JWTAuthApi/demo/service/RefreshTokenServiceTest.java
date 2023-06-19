@@ -1,7 +1,7 @@
 package com.JWTAuthApi.demo.service;
 
 import com.JWTAuthApi.demo.domain.RefreshToken;
-import com.JWTAuthApi.demo.service.user.RefreshTokenService;
+import com.JWTAuthApi.demo.service.login.RefreshTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

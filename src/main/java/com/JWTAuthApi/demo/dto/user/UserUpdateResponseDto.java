@@ -11,5 +11,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserUpdateResponseDto {
     private String username;
-    private String password;
 }

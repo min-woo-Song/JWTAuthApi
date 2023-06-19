@@ -1,4 +1,4 @@
-package com.JWTAuthApi.demo.service.user;
+package com.JWTAuthApi.demo.service.login;
 
 import com.JWTAuthApi.demo.domain.RefreshToken;
 import com.JWTAuthApi.demo.mapper.RefreshTokenRepository;
