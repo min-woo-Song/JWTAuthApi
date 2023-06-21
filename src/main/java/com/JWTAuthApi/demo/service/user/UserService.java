@@ -27,9 +27,6 @@ public class UserService {
 
     @Transactional
     public User findByEmail(String email) {
-        if (userRepository.findByEmail(email) == null)
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-
         return userRepository.findByEmail(email);
     }
 
@@ -52,11 +49,13 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
     public void updatePassword(Long userId, String password) {
         String EncodePassword = passwordEncoder.encode(password);
         userRepository.updateUserPassword(userId, EncodePassword);
     }
 
+    @Transactional
     public UserSignupResponseDto currentUser(Long userId) {
         User findUser = this.findById(userId);
         return UserSignupResponseDto

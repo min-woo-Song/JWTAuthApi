@@ -32,16 +32,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        // userRequest에 있는 Access Token으로 유저정보 획득
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         try {
             return this.process(userRequest, oAuth2User);
         } catch (Exception ex) {
-            /**
-             * 사용금지
-             */
-            ex.printStackTrace();
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
             // 시스템 문제로 내부 인증관련 처리 요청을 할 수 없는 경우
         }
@@ -53,7 +48,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         ProviderType providerType = ProviderType.valueOf(userRequest.getClientRegistration()
                 .getRegistrationId().toUpperCase());
 
-        // providerType, Attributes 이용하여 분류하여 user 정보를 가져온다
+        // providerType, Attributes로 분류하여 user 정보를 가져온다
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, oAuth2User.getAttributes());
 
         User user = userRepository.findByEmail(userInfo.getEmail());

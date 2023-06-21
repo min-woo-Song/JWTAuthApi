@@ -53,6 +53,8 @@ public class LoginService {
 
     public UserLoginResponseDto login(UserLoginDto userLoginDto) {
         User user = userService.findByEmail(userLoginDto.getEmail());
+        if (user == null)
+            throw new CustomException(ErrorCode.ID_PASSWORD_NOT_MATCH);
 
         if (!passwordEncoder.matches(userLoginDto.getPassword(), user.getPassword()))
             throw new CustomException(ErrorCode.ID_PASSWORD_NOT_MATCH);

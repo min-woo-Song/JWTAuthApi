@@ -30,14 +30,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token="";
-        log.info("req= {}",request.getParameter("email"));
         try {
-            log.info("***** 토큰 검증 로직 실행 *****");
             token = getToken(request);
-            log.info("***** request 토큰 값 = {} ***** ", token);
-            if (StringUtils.hasText(token)) {
+            if (StringUtils.hasText(token))
                 getAuthentication(token);
-            }
+
             filterChain.doFilter(request, response);
 
         } catch (NullPointerException | IllegalStateException e) {

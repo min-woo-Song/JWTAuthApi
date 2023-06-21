@@ -39,16 +39,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-
-        log.info("********** Success Handler 진입 **********");
-
         String targetUrl = determineTargetUrl(request, response, authentication);
-        log.info("*************url={}", targetUrl);
 
         if (response.isCommitted()) {
             log.debug("Response has already been committed.");
             return;
         }
+
         // URI 쿠키 삭제
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(
